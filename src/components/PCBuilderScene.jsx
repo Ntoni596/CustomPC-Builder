@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 import PCCase from './PCCase'
 
 function PCBuilderScene({ components }) {
@@ -24,9 +24,7 @@ function PCBuilderScene({ components }) {
         shadow-mapSize-height={2048}
       />
       <pointLight position={[-10, 10, -5]} intensity={0.5} />
-      
-      {/* Environment for reflections */}
-      <Environment preset="city" />
+      <spotLight position={[0, 10, 0]} intensity={0.3} angle={0.3} />
       
       {/* Ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]} receiveShadow>
