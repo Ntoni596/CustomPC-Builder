@@ -1,47 +1,31 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
-import PCBuilderScene from './components/PCBuilderScene'
+import PanelPreview from './components/PanelPreview'
 
-const componentCatalog = {
-  case: [
+const baseChassis = {
+  name: 'Lian Li O11 Dynamic EVO',
+  brand: 'Aftershock AU',
+  printArea: 'Dual panel',
+  surfaces: [
     {
-      id: 'velox-atx',
-      name: 'Velox ATX',
-      size: 'tower',
-      hasRender: true,
-      panelZone: 'full-height',
-      description: 'Flagship tempered glass tower with full height panel print area.',
+      id: 'front-glass',
+      label: 'Tempered glass',
+      name: 'Front showcase window',
+      finish: 'Print-ready',
+      desc: 'Use UV-cured ink for vibrant colours. Uploads are centred and can be offset for logo placement.',
     },
     {
-      id: 'ion-compact',
-      name: 'ION Compact',
-      size: 'sff',
-      hasRender: true,
-      panelZone: 'split',
-      description: 'Space-efficient chassis optimised for air and AIO cooling.',
-    },
-    {
-      id: 'placeholder-tower',
-      name: 'Legacy Tower',
-      size: 'tower',
-      hasRender: false,
-      panelZone: 'full-height',
-      description: 'Legacy enclosure – shows placeholder until render is available.',
+      id: 'side-mesh',
+      label: 'Ventilated steel',
+      name: 'Side mesh panel',
+      finish: 'Breathable',
+      desc: 'Optimised for breathable graphics. Keep opacity under 90% to preserve ventilation.',
     },
   ],
-  motherboard: [
-    { id: 'z790', name: 'Z790 ATX', formFactor: 'atx', hasRender: true },
-    { id: 'b650', name: 'B650 Micro ATX', formFactor: 'microatx', hasRender: true },
-    { id: 'placeholder-board', name: 'Placeholder Board', formFactor: 'atx', hasRender: false },
-  ],
-  cpu: [
-    { id: 'i9', name: 'Intel i9', power: 'high', hasRender: true },
-    { id: 'r7', name: 'Ryzen 7', power: 'balanced', hasRender: true },
-  ],
-  gpu: [
-    { id: '4090', name: 'RTX 4090', length: 'long', hasRender: true },
-    { id: '4070', name: 'RTX 4070', length: 'standard', hasRender: true },
-    { id: 'placeholder-gpu', name: 'Placeholder GPU', length: 'standard', hasRender: false },
+  quickNotes: [
+    'Base unit locked to O11 Dynamic EVO geometry for consistent panel sizing.',
+    'JSON export mirrors printer pipeline – no rework required by the factory team.',
+    'Alignment grid doubles as a proof if no artwork is supplied.',
   ],
 }
 
@@ -60,40 +44,12 @@ const defaultPanelGrid =
 </svg>`)
 
 function App() {
-  const [selectedParts, setSelectedParts] = useState({
-    case: 'velox-atx',
-    motherboard: 'z790',
-    cpu: 'i9',
-    gpu: '4090',
-  })
-
   const [panelOverlay, setPanelOverlay] = useState({
     image: defaultPanelGrid,
     position: { x: 0, y: 0 },
     scale: 1,
     opacity: 0.9,
   })
-
-  const selectedCase = useMemo(
-    () => componentCatalog.case.find((item) => item.id === selectedParts.case),
-    [selectedParts.case],
-  )
-  const selectedMotherboard = useMemo(
-    () => componentCatalog.motherboard.find((item) => item.id === selectedParts.motherboard),
-    [selectedParts.motherboard],
-  )
-  const selectedCpu = useMemo(
-    () => componentCatalog.cpu.find((item) => item.id === selectedParts.cpu),
-    [selectedParts.cpu],
-  )
-  const selectedGpu = useMemo(
-    () => componentCatalog.gpu.find((item) => item.id === selectedParts.gpu),
-    [selectedParts.gpu],
-  )
-
-  const handleComponentSelect = (type, value) => {
-    setSelectedParts((prev) => ({ ...prev, [type]: value }))
-  }
 
   const handlePanelUpload = (event) => {
     const file = event.target.files?.[0]
@@ -110,10 +66,19 @@ function App() {
     setPanelOverlay((prev) => ({ ...prev, [key]: value }))
   }
 
+  const resetOverlay = () => {
+    setPanelOverlay({
+      image: defaultPanelGrid,
+      position: { x: 0, y: 0 },
+      scale: 1,
+      opacity: 0.9,
+    })
+  }
+
   const exportPanelPackage = () => {
     const payload = {
-      caseId: selectedCase?.id,
-      panelZone: selectedCase?.panelZone,
+      caseName: baseChassis.name,
+      surfaces: baseChassis.surfaces.map((surface) => surface.id),
       overlay: panelOverlay,
       notes: 'Feed directly to UV printer – dimensions are normalised to the panel mesh in the scene.',
     }
@@ -122,9 +87,10 @@ function App() {
 
     const link = document.createElement('a')
     link.href = url
-    link.download = 'panel-print-package.json'
+    link.download = 'o11-evo-uv-print-package.json'
+    document.body.appendChild(link)
     link.click()
-
+    document.body.removeChild(link)
     URL.revokeObjectURL(url)
   }
 
@@ -132,36 +98,27 @@ function App() {
     <div className="app-container">
       <header>
         <div>
-          <p className="eyebrow">Realtime visualiser • production-ready UV panel exports</p>
-          <h1>Interactive Custom PC Builder</h1>
-          <p>Create a photoreal single source of truth for customers and the build team.</p>
+          <p className="eyebrow">Aftershock AU</p>
+          <h1>O11 Dynamic EVO panel print desk</h1>
+          <p>Focus on the chassis we ship every day. Upload customer artwork, preview, and export UV-ready files.</p>
         </div>
         <div className="header-actions">
-          <div className="badge">Aftershock AU ready</div>
-          <div className="badge ghost">Placeholder renders auto handled</div>
+          <div className="badge">Printer workflow aligned</div>
+          <div className="badge ghost">Tempered glass + mesh</div>
         </div>
       </header>
 
-      <div className="builder-container">
-        <div className="scene-column">
-          <div className="scene-topbar">
-            <div>
-              <h2>Live 3D preview</h2>
-              <p className="muted">Rotate, zoom, and see components reposition instantly.</p>
-            </div>
-            <div className="pill">Panel alignment grid toggles with your upload.</div>
-          </div>
-          <div className="scene-container">
-            <PCBuilderScene
-              components={{
-                case: selectedCase,
-                motherboard: selectedMotherboard,
-                cpu: selectedCpu,
-                gpu: selectedGpu,
-              }}
-              panelOverlay={panelOverlay}
-              placeholderTexture={defaultPanelGrid}
-            />
+      <div className="layout">
+        <div className="preview-column">
+          <PanelPreview chassis={baseChassis} panelOverlay={panelOverlay} placeholderTexture={defaultPanelGrid} />
+
+          <div className="notes-card">
+            <p className="eyebrow">Production crib notes</p>
+            <ul>
+              {baseChassis.quickNotes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -169,53 +126,9 @@ function App() {
           <section className="component-section">
             <div className="section-header">
               <div>
-                <p className="eyebrow">Compatibility aware</p>
-                <h3>Component library</h3>
-                <p className="muted">Select parts to reposition the internal layout.</p>
-              </div>
-              <div className="legend">
-                <span className="legend-dot available" /> Rendered
-                <span className="legend-dot placeholder" /> Placeholder
-              </div>
-            </div>
-
-            {Object.entries(componentCatalog).map(([type, options]) => (
-              <div key={type} className="component-group">
-                <div className="group-header">
-                  <h4>{type.charAt(0).toUpperCase() + type.slice(1)}</h4>
-                  <span className="count">{options.length} options</span>
-                </div>
-                <div className="options-grid">
-                  {options.map((option) => (
-                    <button
-                      key={option.id}
-                      className={`option-card ${selectedParts[type] === option.id ? 'active' : ''}`}
-                      onClick={() => handleComponentSelect(type, option.id)}
-                    >
-                      <div className="option-header">
-                        <span className={`dot ${option.hasRender ? 'available' : 'placeholder'}`} />
-                        <strong>{option.name}</strong>
-                      </div>
-                      {option.description && <p className="muted small">{option.description}</p>}
-                      {!option.description && option.formFactor && (
-                        <p className="muted small">Form factor: {option.formFactor.toUpperCase()}</p>
-                      )}
-                      {!option.hasRender && (
-                        <p className="placeholder-note">No render yet – showing neutral block.</p>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </section>
-
-          <section className="component-section">
-            <div className="section-header">
-              <div>
-                <p className="eyebrow">UV printer ready</p>
-                <h3>Panel print setup</h3>
-                <p className="muted">Upload artwork, line it up, then export the JSON package for production.</p>
+                <p className="eyebrow">Print surface locked</p>
+                <h3>Artwork upload</h3>
+                <p className="muted">Drop in customer art for the O11 Dynamic EVO. Your file sits on both printable panels.</p>
               </div>
             </div>
 
@@ -270,52 +183,53 @@ function App() {
                   onChange={(e) => handlePanelChange('opacity', Number(e.target.value))}
                 />
               </div>
-              <button className="export" onClick={exportPanelPackage}>Download UV print package</button>
+              <div className="actions">
+                <button className="ghost" onClick={resetOverlay}>Reset to alignment grid</button>
+                <button className="export" onClick={exportPanelPackage}>Download UV print package</button>
+              </div>
             </div>
           </section>
 
           <section className="component-section">
             <div className="section-header">
               <div>
-                <p className="eyebrow">Snapshot for the build team</p>
-                <h3>Live BOM summary</h3>
-                <p className="muted">Auto-updates as you click. Includes render coverage flags.</p>
+                <p className="eyebrow">Printer ready</p>
+                <h3>Hand-off checklist</h3>
+                <p className="muted">Everything the panel-print team needs in one JSON payload.</p>
               </div>
             </div>
             <ul className="summary-list">
               <li>
                 <div>
-                  <strong>Case</strong>
-                  <p className="muted small">{selectedCase?.name}</p>
+                  <strong>Chassis</strong>
+                  <p className="muted small">{baseChassis.name}</p>
                 </div>
-                <span className={`pill ${selectedCase?.hasRender ? 'ok' : 'warn'}`}>
-                  {selectedCase?.hasRender ? 'Render ready' : 'Placeholder'}
+                <span className="pill ok">Locked</span>
+              </li>
+              <li>
+                <div>
+                  <strong>Surfaces</strong>
+                  <p className="muted small">{baseChassis.surfaces.map((s) => s.label).join(' + ')}</p>
+                </div>
+                <span className="pill ok">Included</span>
+              </li>
+              <li>
+                <div>
+                  <strong>Artwork source</strong>
+                  <p className="muted small">{panelOverlay.image === defaultPanelGrid ? 'Using alignment grid' : 'Customer upload applied'}</p>
+                </div>
+                <span className={`pill ${panelOverlay.image === defaultPanelGrid ? 'warn' : 'ok'}`}>
+                  {panelOverlay.image === defaultPanelGrid ? 'Awaiting art' : 'Ready'}
                 </span>
               </li>
               <li>
                 <div>
-                  <strong>Motherboard</strong>
-                  <p className="muted small">{selectedMotherboard?.name}</p>
+                  <strong>Offsets</strong>
+                  <p className="muted small">
+                    X: {panelOverlay.position.x.toFixed(2)} | Y: {panelOverlay.position.y.toFixed(2)} | Scale: {panelOverlay.scale.toFixed(2)}
+                  </p>
                 </div>
-                <span className={`pill ${selectedMotherboard?.hasRender ? 'ok' : 'warn'}`}>
-                  {selectedMotherboard?.hasRender ? 'Render ready' : 'Placeholder'}
-                </span>
-              </li>
-              <li>
-                <div>
-                  <strong>CPU</strong>
-                  <p className="muted small">{selectedCpu?.name}</p>
-                </div>
-                <span className="pill ok">Profiled</span>
-              </li>
-              <li>
-                <div>
-                  <strong>GPU</strong>
-                  <p className="muted small">{selectedGpu?.name}</p>
-                </div>
-                <span className={`pill ${selectedGpu?.hasRender ? 'ok' : 'warn'}`}>
-                  {selectedGpu?.hasRender ? 'Render ready' : 'Placeholder'}
-                </span>
+                <span className="pill ghost">Opacity {Math.round(panelOverlay.opacity * 100)}%</span>
               </li>
             </ul>
           </section>
