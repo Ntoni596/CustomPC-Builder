@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
+import { RepeatWrapping } from 'three'
 
 function PCCase({ caseSpec, motherboardSpec, gpuSpec, panelOverlay, placeholderTexture }) {
   const groupRef = useRef()
@@ -19,10 +20,14 @@ function PCCase({ caseSpec, motherboardSpec, gpuSpec, panelOverlay, placeholderT
   }, [caseSpec])
 
   const panelTexture = useTexture(panelOverlay?.image || placeholderTexture)
-  if (panelTexture) {
-    panelTexture.wrapS = panelTexture.wrapT = 1000
-    panelTexture.repeat.set(panelOverlay.scale, panelOverlay.scale)
-  }
+  const configuredTexture = useMemo(() => {
+    if (!panelTexture) return null
+    const clone = panelTexture.clone()
+    clone.wrapS = clone.wrapT = RepeatWrapping
+    clone.repeat.set(panelOverlay.scale, panelOverlay.scale)
+    clone.needsUpdate = true
+    return clone
+  }, [panelOverlay.scale, panelTexture])
 
   const motherboardWidth = motherboardSpec?.formFactor === 'microatx' ? 0.9 : 1.1
   const motherboardDepth = motherboardSpec?.formFactor === 'microatx' ? 0.9 : 1.1
@@ -107,7 +112,7 @@ function PCCase({ caseSpec, motherboardSpec, gpuSpec, panelOverlay, placeholderT
 
       <mesh position={[dimensions.width / 2 + 0.03 + panelOverlay.position.x, 0, 0]} castShadow>
         <planeGeometry args={[dimensions.height * 0.9 * panelOverlay.scale, dimensions.height * 0.9 * panelOverlay.scale]} />
-        <meshStandardMaterial map={panelTexture} transparent opacity={panelOverlay.opacity} side={2} />
+        <meshStandardMaterial map={configuredTexture} transparent opacity={panelOverlay.opacity} side={2} />
       </mesh>
 
       {[-1, 1].map((x) =>

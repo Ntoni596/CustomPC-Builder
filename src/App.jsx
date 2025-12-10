@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import './App.css'
 import PanelPreview from './components/PanelPreview'
+import frontGlass from './assets/chassis/front-glass.svg'
+import sideMesh from './assets/chassis/side-mesh.svg'
+import frontAngle from './assets/chassis/front-angle.svg'
 
 const baseChassis = {
   name: 'Lian Li O11 Dynamic EVO',
@@ -12,6 +15,8 @@ const baseChassis = {
       label: 'Tempered glass',
       name: 'Front showcase window',
       finish: 'Print-ready',
+      preview: frontGlass,
+      hotspot: 'Full height glass for hero artwork. 400mm x 450mm normalised space.',
       desc: 'Use UV-cured ink for vibrant colours. Uploads are centred and can be offset for logo placement.',
     },
     {
@@ -19,7 +24,18 @@ const baseChassis = {
       label: 'Ventilated steel',
       name: 'Side mesh panel',
       finish: 'Breathable',
+      preview: sideMesh,
+      hotspot: 'Mesh intake surface. Leave light spill-through for airflow.',
       desc: 'Optimised for breathable graphics. Keep opacity under 90% to preserve ventilation.',
+    },
+    {
+      id: 'angle-proof',
+      label: 'Assembly proof',
+      name: 'Perspective reference',
+      finish: 'Visualizer',
+      preview: frontAngle,
+      hotspot: 'Use to sanity check alignment across glass + mesh before exporting.',
+      desc: 'Reference-only angle that mirrors the product photography provided.',
     },
   ],
   quickNotes: [
