@@ -97,6 +97,7 @@ header p {
 .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; color: #94a3b8; margin: 0; }
 .muted { color: #94a3b8; }
 .small { font-size: 0.85rem; }
+.micro { font-size: 0.75rem; color: #cbd5e1; opacity: 0.75; margin: -0.25rem 0 0; }
 
 .panel-upload { margin: 0.75rem 0; display: grid; gap: 0.35rem; }
 .upload-label { padding: 0.65rem; border: 1px dashed rgba(226, 232, 240, 0.2); border-radius: 10px; background: rgba(255, 255, 255, 0.04); cursor: pointer; display: inline-block; width: fit-content; }

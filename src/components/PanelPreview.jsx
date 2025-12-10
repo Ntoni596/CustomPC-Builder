@@ -31,13 +31,17 @@ function PanelPreview({ chassis, panelOverlay, placeholderTexture }) {
             </div>
 
             <div className="surface-frame">
-              <div className="case-shell">
+              <div
+                className="case-shell"
+                style={{ backgroundImage: surface.preview ? `url(${surface.preview})` : undefined }}
+              >
                 <div className={`panel panel-${surface.id}`}> </div>
                 <div className="panel-overlay" style={overlayStyle} />
               </div>
             </div>
 
             <p className="muted small">{surface.desc}</p>
+            {surface.hotspot ? <p className="muted micro">{surface.hotspot}</p> : null}
           </div>
         ))}
       </div>
